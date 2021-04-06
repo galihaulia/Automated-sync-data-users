@@ -1,7 +1,6 @@
 const asyncHandler = require('../middleware/asyncHandler');
-const { 
-    getInstanceGetSSO
-} = require('../lib/helper');
+const axios = require('axios');
+const querystring = require('querystring');
 
 const {
     DB_TABLES: {
@@ -17,10 +16,12 @@ const {
 const sequelize = require('sequelize');
 const { Op } = sequelize;
 
-const apiSSO = getInstanceGetSSO();
-
 exports.getDataUser = asyncHandler(async (req, res, next) => {
+    const TOKEN_URL = 'https://sso.petrokimia-gresik.net/token'
+    const DATA_URL = 'https://sso.petrokimia-gresik.net/api/Employee/List?unitId=&nik=&name='
     const now = new Date()
+    let hrstart = process.hrtime()
+
 
     let datas = []
     let dataUsers = []
@@ -30,7 +31,28 @@ exports.getDataUser = asyncHandler(async (req, res, next) => {
     let listDeptNon = []
     let listJobNon = []
 
-    await apiSSO.get()
+    let payload = querystring.stringify({
+        grant_type: 'password',
+        username: 'app_vendor',
+        password: 'apP@v3nd0r123!!'
+    })
+
+    let dataToken = null
+    await axios.post(TOKEN_URL, payload)
+    .then((response) => {
+        if (response.data) {
+            dataToken = response.data.access_token
+        }
+    })
+    
+    let option = {
+        headers: {
+            'accept': 'application/json',
+            'authorization': `Bearer ${dataToken}`
+        }
+    }
+
+    await axios.get(DATA_URL, option)
     .then((response) => {
         if (response.data) {
             response.data.map((result) => {
@@ -258,12 +280,19 @@ exports.getDataUser = asyncHandler(async (req, res, next) => {
     let data = {
         datas: datas.length,
         dataUsers: dataUsers.length,
+        sumOfDataUpdate: dataUpdate.length,
         dataUpdate: dataUpdate,
+        sumOfDataUpdated: dataUpdated.length,
         dataUpdated: dataUpdated,
         dataNew: dataNew.length,
         listDeptNon: listDeptNon.length,
         listJobNon: listJobNon.length
     }
     
+    let end = new Date() - now,
+    hrend = process.hrtime(hrstart)
+
+    console.info('Execution time: %dms', end)
+    console.info('Execution time (hr): %ds %dms', hrend[0], hrend[1] / 1000000)
     res.jsend.success(data)
 });

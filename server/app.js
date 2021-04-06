@@ -3,13 +3,13 @@ const cors = require('cors')
 const jsend = require('jsend')
 const path = require('path')
 const app = express()
-const router = express.Router()
 const swaggerUI = require('swagger-ui-express')
 const openApiDoc = require('./openApiDoc')
 
 const {
     getDataUser
 } = require("./controllers/syncusers");
+const asyncHandler = require('./middleware/asyncHandler')
 
 const publicPath = path.join(__dirname,'../public')
 //MIDDLEWARE
@@ -19,7 +19,6 @@ app.use(jsend.middleware)
 app.use('/',express.static(publicPath))
 // app.engine('handlebars',exphbs({defaultLayout : 'main',layoutsDir : 'views/layouts'}))
 // app.set('view engine','handlebars')
-
 
 app.get('/sync-users', getDataUser);
 // app.use('/api-doc',swaggerUI.serve,swaggerUI.setup(openApiDoc.default()))
