@@ -5,6 +5,7 @@ const path = require('path')
 const app = express()
 const swaggerUI = require('swagger-ui-express')
 const openApiDoc = require('./openApiDoc')
+const cron = require('node-cron');
 
 const {
     getDataUser
