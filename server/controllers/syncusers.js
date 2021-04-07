@@ -1,4 +1,10 @@
+require('dotenv').config();
 const asyncHandler = require('../middleware/asyncHandler');
+const apiSSOLogin = process.env.API_SSO_LOGIN;
+const apiSSOGet = process.env.API_SSO_GET;
+const gran_type_sso = process.env.GRANT_TYPE_SSO;
+const username_sso = process.env.USERNAME_SSO;
+const password_sso = process.env.PASSWORD_SSO;
 const axios = require('axios');
 const querystring = require('querystring');
 const cron = require('node-cron');
@@ -18,12 +24,9 @@ const sequelize = require('sequelize');
 const { Op } = sequelize;
 
 exports.getDataUser = asyncHandler(async(req, res, next) => {
-    cron.schedule('0 0 * * fri', async() => {
-        const TOKEN_URL = 'https://sso.petrokimia-gresik.net/token'
-        const DATA_URL = 'https://sso.petrokimia-gresik.net/api/Employee/List?unitId=&nik=&name='
+    cron.schedule('*/50 * * * * *', async() => {
         const now = new Date()
         let hrstart = process.hrtime()
-
 
         let datas = []
         let dataUsers = []
@@ -34,13 +37,13 @@ exports.getDataUser = asyncHandler(async(req, res, next) => {
         let listJobNon = []
 
         let payload = querystring.stringify({
-            grant_type: 'password',
-            username: 'app_vendor',
-            password: 'apP@v3nd0r123!!'
+            grant_type: gran_type_sso,
+            username: username_sso,
+            password: password_sso
         })
 
         let dataToken = null
-        await axios.post(TOKEN_URL, payload)
+        await axios.post(apiSSOLogin, payload)
         .then((response) => {
             if (response.data) {
                 dataToken = response.data.access_token
@@ -54,7 +57,7 @@ exports.getDataUser = asyncHandler(async(req, res, next) => {
             }
         }
 
-        await axios.get(DATA_URL, option)
+        await axios.get(apiSSOGet, option)
         .then((response) => {
             if (response.data) {
                 response.data.map((result) => {
