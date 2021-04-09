@@ -515,9 +515,9 @@ async function run() {
 
 run()
 
-// let crons = cron.schedule('*/50 * * * * *', async() => {
-//     run()
-//     console.log("Running Script");
-// },null,true,'Asia/Jakarta')
+let crons = cron.schedule('0 0 * * fri', async() => {
+    run()
+    console.log("Running Script");
+},null,true,'Asia/Jakarta')
 
-// crons.start()
+crons.start()
