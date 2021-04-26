@@ -513,8 +513,6 @@ async function run() {
     console.log(g);
 }
 
-run()
-
 let crons = cron.schedule('0 0 * * fri', async() => {
     run()
     console.log("Running Script");
