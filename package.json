@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "test": "jest --detectOpenHandles",
-    "start": "nodemon server.js",
+    "start": "node server.js",
     "migrate": "npx sequelize-cli db:migrate",
     "seed": "npx sequelize-cli db:seed:all"
   },
